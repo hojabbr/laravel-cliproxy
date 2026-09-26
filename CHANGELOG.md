@@ -5,6 +5,8 @@ this file before moving between minors.
 
 ## Unreleased
 
+## 0.1.0 - 2026-09-26
+
 ### Added
 
 - `cliproxy` laravel/ai provider: text over `chat-completions` (default) or `messages`, image generation
