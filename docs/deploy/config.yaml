@@ -1,0 +1,35 @@
+# A recommended first config for CLIProxyAPI in front of a Laravel application.
+#
+# With PGSTORE_DSN set, mount this file as /CLIProxyAPI/config.example.yaml: the store copies it
+# only while its config table is empty, and from then on the panel owns the config. Without a
+# store, mount it as /CLIProxyAPI/config.yaml.
+#
+# Replace both keys. Upstreams (API keys, OpenAI-compatible providers, logins), model aliases and
+# fallback order are added in the panel at <gateway>/management.html, not here.
+
+host: ""
+port: 8317
+
+remote-management:
+  # The application reaches the gateway over the network, not over localhost.
+  allow-remote: true
+  secret-key: "change-me-management-key"
+  disable-control-panel: false
+  # Download the panel once, then never replace it behind your back.
+  disable-auto-update-panel: true
+
+# One client key per application; laravel-cliproxy sends it as CLIPROXY_KEY.
+api-keys:
+  - "change-me-client-key"
+
+routing:
+  # Use the first healthy credential until it cools down, then the next: a predictable order.
+  strategy: "fill-first"
+
+debug: false
+plugins:
+  enabled: false
+logging-to-file: false
+usage-statistics-enabled: false
+discovery:
+  enabled: false

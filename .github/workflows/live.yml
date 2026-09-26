@@ -1,0 +1,47 @@
+name: live
+
+# The package against a real CLIProxyAPI with a stand-in upstream (no vendor key needed): on every
+# push against the version the README supports, and weekly against the newest image, so a gateway
+# change that breaks the package is seen before someone upgrades into it.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    name: CLIProxyAPI ${{ matrix.gateway }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        gateway: ['v7.3.18', 'latest']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - run: composer update --prefer-dist --no-interaction --no-progress
+      - name: Start the gateway
+        run: |
+          cp docs/deploy/config.yaml "$RUNNER_TEMP/config.yaml"
+          docker run -d --name cliproxy -p 8317:8317 --add-host=host.docker.internal:host-gateway \
+            -v "$RUNNER_TEMP/config.yaml:/CLIProxyAPI/config.yaml" eceasy/cli-proxy-api:${{ matrix.gateway }}
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8317/healthz && break; sleep 1; done
+      - name: Live suite
+        env:
+          CLIPROXY_LIVE_URL: http://127.0.0.1:8317
+          CLIPROXY_LIVE_KEY: change-me-client-key
+          CLIPROXY_LIVE_MANAGEMENT_KEY: change-me-management-key
+        run: composer test:live
+      - name: Gateway log
+        if: failure()
+        run: docker logs cliproxy

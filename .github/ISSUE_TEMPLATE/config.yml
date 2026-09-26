@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: A problem in the gateway itself
+    url: https://github.com/router-for-me/CLIProxyAPI/issues
+    about: Upstream routing, credentials and translation belong to CLIProxyAPI.

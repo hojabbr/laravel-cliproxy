@@ -1,0 +1,79 @@
+# CLIProxyAPI on Kubernetes: one replica, non-root, read-only root filesystem.
+#
+# One replica because login tokens refresh in place: two pods would race to refresh the same token.
+# Config and tokens live in Postgres (PGSTORE_DSN), so the pod itself holds nothing worth keeping.
+# If a pooler sits in front of Postgres, give the gateway a session-mode pool: it uses prepared
+# statements. Expose the panel only on an internal host.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cliproxy-seed
+data:
+  config.example.yaml: |
+    # paste docs/deploy/config.yaml here, with the keys taken from your secret store
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cliproxy
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: { app.kubernetes.io/name: cliproxy }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: cliproxy }
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: cliproxy
+          image: eceasy/cli-proxy-api:v7.3.18 # pin by digest
+          env:
+            - name: PGSTORE_DSN
+              valueFrom: { secretKeyRef: { name: cliproxy, key: PGSTORE_DSN } }
+            - { name: PGSTORE_SCHEMA, value: cliproxy }
+            - { name: PGSTORE_LOCAL_PATH, value: /data }
+          ports:
+            - { name: http, containerPort: 8317 }
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 30
+            failureThreshold: 4
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          resources:
+            requests: { cpu: 50m, memory: 96Mi }
+            limits: { memory: 512Mi }
+          volumeMounts:
+            - { name: seed, mountPath: /CLIProxyAPI/config.example.yaml, subPath: config.example.yaml, readOnly: true }
+            - { name: data, mountPath: /data }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: seed
+          configMap: { name: cliproxy-seed }
+        - name: data
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cliproxy
+spec:
+  selector: { app.kubernetes.io/name: cliproxy }
+  ports:
+    - { name: http, port: 8317, targetPort: http }

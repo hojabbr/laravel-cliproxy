@@ -1,0 +1,77 @@
+{
+    "name": "hojabbr/laravel-cliproxy",
+    "description": "CLIProxyAPI for Laravel: a laravel/ai driver over either wire protocol, gateway-first routing with a fallback of your choice, the management API, and batches run as queued calls.",
+    "keywords": [
+        "laravel",
+        "laravel-ai",
+        "cliproxyapi",
+        "cliproxy",
+        "ai-gateway",
+        "llm-gateway",
+        "llm"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/hojabbr/laravel-cliproxy",
+    "authors": [
+        {
+            "name": "Hossein Jabbari",
+            "homepage": "https://github.com/hojabbr",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/hojabbr/laravel-cliproxy/issues",
+        "source": "https://github.com/hojabbr/laravel-cliproxy"
+    },
+    "require": {
+        "php": "^8.3",
+        "illuminate/console": "^12.0|^13.0",
+        "illuminate/contracts": "^12.0|^13.0",
+        "illuminate/database": "^12.0|^13.0",
+        "illuminate/http": "^12.0|^13.0",
+        "illuminate/queue": "^12.0|^13.0",
+        "illuminate/support": "^12.0|^13.0",
+        "laravel/ai": "^1.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.9",
+        "laravel/pint": "^1.26",
+        "orchestra/testbench": "^10.6|^11.0",
+        "pestphp/pest": "^3.8|^4.0|^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hojabbr\\CliProxy\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Hojabbr\\CliProxy\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Hojabbr\\CliProxy\\CliProxyServiceProvider"
+            ],
+            "aliases": {
+                "CliProxy": "Hojabbr\\CliProxy\\Facades\\CliProxy"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "vendor/bin/pest --exclude-group=live",
+        "test:live": "vendor/bin/pest --group=live",
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
+        "format": "vendor/bin/pint"
+    }
+}

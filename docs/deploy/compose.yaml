@@ -1,0 +1,22 @@
+# CLIProxyAPI next to a Laravel application, with its config and login tokens in Postgres.
+#
+# Pin the image by digest in production. The gateway runs as an unprivileged user with a read-only
+# root and writes only /data and /tmp. Set CLIPROXY_URL=http://cliproxy:8317 in the application.
+services:
+  cliproxy:
+    image: 'eceasy/cli-proxy-api:v7.3.18'
+    user: '1000:1000'
+    read_only: true
+    ports:
+      - '127.0.0.1:8317:8317'
+    environment:
+      PGSTORE_DSN: 'postgresql://app:secret@postgres:5432/app?sslmode=disable'
+      PGSTORE_SCHEMA: cliproxy
+      PGSTORE_LOCAL_PATH: /data
+    volumes:
+      - './config.yaml:/CLIProxyAPI/config.example.yaml:ro'
+    tmpfs:
+      - '/data:uid=1000,gid=1000'
+      - '/tmp:uid=1000,gid=1000'
+    depends_on:
+      - postgres
