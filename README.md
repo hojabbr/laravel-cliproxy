@@ -256,9 +256,6 @@ With `PGSTORE_DSN` set, CLIProxyAPI copies `config.example.yaml` into Postgres o
 table is empty, so mount your seed at that path: from the first boot on, the panel owns the config
 and a restart never overwrites an edit.
 
-The recommended seed sets `disable-claude-cloak-mode: true`, so client traffic is never presented
-as another client. Check your upstreams' terms before connecting a subscription login.
-
 ## Versioning
 
 Semantic Versioning. Below 1.0.0 a breaking change lands in a new minor, so pin with `^0.1` and read
