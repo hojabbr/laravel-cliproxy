@@ -5,6 +5,13 @@ this file before moving between minors.
 
 ## Unreleased
 
+### Changed
+
+- Supported and tested against CLIProxyAPI v8.0.x as well as v7.3.x; the deploy examples start from
+  v8.0.20. From v8.0.20 the gateway carries document blocks on the `messages` protocol to an
+  openai-compatibility upstream; it still drops the structured-output format there, so
+  `chat-completions` remains the protocol that carries both everywhere.
+
 ## 0.1.0 - 2026-09-26
 
 ### Added

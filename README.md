@@ -24,7 +24,7 @@ vendor serves a model is decided in your gateway, not here.
 
 - PHP 8.3 or newer, Laravel 12 or 13, laravel/ai 1.x
 - A running CLIProxyAPI (see [Running a gateway](#running-a-gateway)). Supported and tested:
-  v7.3.x.
+  v7.3.x and v8.0.x.
 
 ## Install
 
@@ -87,11 +87,11 @@ The gateway accepts both and translates either to the upstream that serves the m
 | Documents (PDF) | as `file` parts | as document blocks, depends on the upstream |
 | Explicit prompt-cache breakpoints | no (upstreams that cache do so on the prefix) | yes, including `#[CacheInstructions]` and the moving breakpoint below |
 
-**Known gateway limit (CLIProxyAPI v7.3.18).** A `messages` request bound for an
-*openai-compatibility* upstream loses its document blocks and its structured-output format without
-an error; text, images, tools and streaming survive. `chat-completions` carries both to every
-upstream. Run `cliproxy:probe` for each model and protocol you depend on; the package's scheduled
-live suite tracks this against the newest gateway.
+**Known gateway limit.** A `messages` request bound for an *openai-compatibility* upstream loses
+its structured-output format without an error, and before CLIProxyAPI v8.0.20 its document blocks
+too; text, images, tools and streaming survive. `chat-completions` carries both to every upstream.
+Run `cliproxy:probe` for each model and protocol you depend on; the package's scheduled live suite
+tracks this against the newest gateway.
 
 ### A cache breakpoint that follows the conversation
 

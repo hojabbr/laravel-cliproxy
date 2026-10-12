@@ -1,7 +1,7 @@
 name: live
 
 # The package against a real CLIProxyAPI with a stand-in upstream (no vendor key needed): on every
-# push against the version the README supports, and weekly against the newest image, so a gateway
+# push against the versions the README supports, and weekly against the newest image, so a gateway
 # change that breaks the package is seen before someone upgrades into it.
 
 on:
@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gateway: ['v7.3.18', 'latest']
+        gateway: ['v7.3.18', 'v8.0.20', 'latest']
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2

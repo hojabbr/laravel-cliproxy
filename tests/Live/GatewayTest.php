@@ -77,8 +77,19 @@ it('sees the upstream through the gateway', function (): void {
         ->and(CliProxy::management()->apiKeys())->toContain((string) env('CLIPROXY_LIVE_KEY'));
 });
 
-it('answers text, streams, tools and structured output in both protocols', function (string $protocol, array $gaps): void {
+/**
+ * The version the gateway reports on every management answer (`X-CPA-Version`).
+ */
+function liveGatewayVersion(): string
+{
+    return (string) CliProxy::management()->request()->get('config')->throw()->header('X-CPA-Version');
+}
+
+it('answers text, streams, tools and structured output in both protocols', function (string $protocol, array $gapsByVersion): void {
     liveProtocol($protocol);
+
+    $version = liveGatewayVersion();
+    $gaps = collect($gapsByVersion)->first(fn (array $gaps, string $below): bool => version_compare($version, $below, '<'), []);
 
     expect((new EchoAgent)->prompt('Say pong.', provider: 'cliproxy', model: 'live-text')->text)->toContain('pong');
 
@@ -102,15 +113,18 @@ it('answers text, streams, tools and structured output in both protocols', funct
         'image generation' => true,
     ], array_fill_keys($gaps, false));
 
-    expect($checks->map(fn (array $check): bool => $check['ok'])->all())->toMatchArray($expected)
+    expect($version)->not->toBe('')
+        ->and($checks->map(fn (array $check): bool => $check['ok'])->all())->toMatchArray($expected)
         ->and($exit)->toBe($gaps === [] ? 0 : 1);
 })->with([
     'chat-completions' => ['chat-completions', []],
-    // CLIProxyAPI v7.3.18 translates a messages request for an openai-compatibility upstream keeping
-    // only text and image blocks and output_config.effort (internal/translator/openai/claude): a
-    // document block and output_config.format are dropped without an error. Pinned so the scheduled
-    // run against the newest gateway sees the day this changes.
-    'messages' => ['messages', ['schema', 'pdf input']],
+    // Keyed by the first version without those gaps (v999: none yet). Before v8.0.20, CLIProxyAPI
+    // translates a messages request for an openai-compatibility upstream keeping only text and image
+    // blocks and output_config.effort (internal/translator/openai/claude): a document block and
+    // output_config.format are dropped without an error. From v8.0.20 the document arrives and the
+    // format is still dropped. Pinned so the scheduled run against the newest gateway sees the day
+    // this changes.
+    'messages' => ['messages', ['v8.0.20' => ['schema', 'pdf input'], 'v999' => ['schema']]],
 ]);
 
 it('carries attachments through to the upstream', function (): void {
