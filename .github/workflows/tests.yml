@@ -19,7 +19,7 @@ jobs:
         laravel: ['12.*', '13.*']
         stability: [prefer-lowest, prefer-stable]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -33,7 +33,7 @@ jobs:
   analyse:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
