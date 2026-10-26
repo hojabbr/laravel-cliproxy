@@ -13,7 +13,6 @@ use Illuminate\Console\Command;
 use Laravel\Ai\Ai;
 use Laravel\Ai\Files\Document;
 use Laravel\Ai\Files\Image;
-use Laravel\Ai\Responses\StructuredAgentResponse;
 use Laravel\Ai\Streaming\Events\TextDelta;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
@@ -72,10 +71,6 @@ class ProbeCommand extends Command
 
         $this->check('schema', function () use ($provider, $model): array {
             $response = (new ProbeSchemaAgent)->prompt('What is six times seven?', provider: $provider, model: $model);
-
-            if (! $response instanceof StructuredAgentResponse) {
-                return [false, 'the answer was not structured: '.$this->clip($response->text)];
-            }
 
             return [($response['answer'] ?? null) === 42, (string) json_encode($response->toArray())];
         });

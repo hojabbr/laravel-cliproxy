@@ -12,6 +12,12 @@ this file before moving between minors.
   openai-compatibility upstream; it still drops the structured-output format there, so
   `chat-completions` remains the protocol that carries both everywhere.
 
+### Fixed
+
+- Images go through `chat/completions` with the image modality again under laravel/ai 1.3, which moved
+  OpenRouter's images to an `images` endpoint the gateway does not serve; the image gateway now builds
+  that request itself.
+
 ## 0.1.0 - 2026-09-26
 
 ### Added
