@@ -4,7 +4,7 @@
 # root and writes only /data and /tmp. Set CLIPROXY_URL=http://cliproxy:8317 in the application.
 services:
   cliproxy:
-    image: 'eceasy/cli-proxy-api:v8.0.44'
+    image: 'eceasy/cli-proxy-api:v8.0.48'
     user: '1000:1000'
     read_only: true
     ports:
