@@ -3,7 +3,7 @@
 Semantic Versioning. Below `1.0.0` a breaking change lands in a new minor, so pin with `^0.1` and read
 this file before moving between minors.
 
-## Unreleased
+## 0.1.1 - 2026-11-13
 
 ### Changed
 
